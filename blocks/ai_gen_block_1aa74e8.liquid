@@ -1,0 +1,218 @@
+{% doc %}
+  @prompt
+    Create a custom button block for the image banner section that includes a background color picker and a background opacity slider (0-100%). The button should apply the selected color and opacity to its background, while keeping the button label, link, and style options. The opacity should be controllable independently from the color.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-custom-button-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-custom-button-wrapper-{{ ai_gen_id }} {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ai-custom-button-link-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_font_size }}px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: {{ block.settings.button_border_thickness }}px solid {{ block.settings.button_border_color }};
+    color: {{ block.settings.button_text_color }};
+    background-color: {{ block.settings.button_background_color | color_modify: 'alpha', block.settings.button_opacity }};
+  }
+
+  .ai-custom-button-link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background_color | color_modify: 'alpha', block.settings.button_hover_opacity }};
+    color: {{ block.settings.button_hover_text_color }};
+    border-color: {{ block.settings.button_hover_border_color }};
+  }
+
+  {% if block.settings.button_style == 'outline' %}
+    .ai-custom-button-link-{{ ai_gen_id }} {
+      background-color: transparent;
+      border-color: {{ block.settings.button_background_color }};
+      color: {{ block.settings.button_background_color }};
+    }
+
+    .ai-custom-button-link-{{ ai_gen_id }}:hover {
+      background-color: {{ block.settings.button_background_color | color_modify: 'alpha', block.settings.button_opacity }};
+      color: {{ block.settings.button_text_color }};
+    }
+  {% endif %}
+
+  {% if block.settings.full_width %}
+    .ai-custom-button-link-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  {% endif %}
+{% endstyle %}
+
+<div class="ai-custom-button-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-custom-button-wrapper-{{ ai_gen_id }}">
+    {% if block.settings.button_link != blank %}
+      <a href="{{ block.settings.button_link }}" class="ai-custom-button-link-{{ ai_gen_id }}">
+        {{ block.settings.button_label }}
+      </a>
+    {% else %}
+      <span class="ai-custom-button-link-{{ ai_gen_id }}">
+        {{ block.settings.button_label }}
+      </span>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Custom button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Button content"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Button style"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Style",
+      "options": [
+        {
+          "value": "solid",
+          "label": "Solid"
+        },
+        {
+          "value": "outline",
+          "label": "Outline"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width button",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "label": "Font size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "button_border_thickness",
+      "label": "Border thickness",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Button colors"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Background color",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "button_opacity",
+      "label": "Background opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Border color",
+      "default": "#3d081b"
+    },
+    {
+      "type": "header",
+      "content": "Hover colors"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background_color",
+      "label": "Hover background color",
+      "default": "#910f3f"
+    },
+    {
+      "type": "range",
+      "id": "button_hover_opacity",
+      "label": "Hover background opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Hover text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_border_color",
+      "label": "Hover border color",
+      "default": "#910f3f"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom button"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,167 @@
+{% doc %}
+  @prompt
+    Create vertical divider lines on either side of the page that run the full length of the page, bordering the main content containers. The lines should be fixed/sticky on the left and right edges of the main content area, spanning the full page height, and styled to complement the existing theme design.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-vertical-dividers-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: {{ block.settings.content_width }}px;
+    height: 100vh;
+    pointer-events: none;
+    z-index: {{ block.settings.z_index }};
+    display: block;
+  }
+
+  .ai-vertical-dividers-{{ ai_gen_id }}::before,
+  .ai-vertical-dividers-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: {{ block.settings.line_thickness }}px;
+    height: 100%;
+    background-color: {{ block.settings.line_color }};
+    opacity: {{ block.settings.line_opacity | divided_by: 100.0 }};
+  }
+
+  .ai-vertical-dividers-{{ ai_gen_id }}::before {
+    left: 0;
+  }
+
+  .ai-vertical-dividers-{{ ai_gen_id }}::after {
+    right: 0;
+  }
+
+  @media screen and (max-width: {{ block.settings.content_width }}px) {
+    .ai-vertical-dividers-{{ ai_gen_id }} {
+      width: 100%;
+      padding: 0 {{ block.settings.mobile_padding }}px;
+    }
+
+    .ai-vertical-dividers-{{ ai_gen_id }}::before {
+      left: {{ block.settings.mobile_padding }}px;
+    }
+
+    .ai-vertical-dividers-{{ ai_gen_id }}::after {
+      right: {{ block.settings.mobile_padding }}px;
+    }
+  }
+{% endstyle %}
+
+<vertical-dividers-{{ ai_gen_id }}
+  class="ai-vertical-dividers-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+</vertical-dividers-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VerticalDividers{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.updatePosition();
+        window.addEventListener('resize', this.updatePosition.bind(this));
+      }
+
+      disconnectedCallback() {
+        window.removeEventListener('resize', this.updatePosition.bind(this));
+      }
+
+      updatePosition() {
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        if (scrollbarWidth > 0) {
+          this.style.marginRight = scrollbarWidth + 'px';
+        } else {
+          this.style.marginRight = '0';
+        }
+      }
+    }
+
+    customElements.define('vertical-dividers-{{ ai_gen_id }}', VerticalDividers{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Vertical dividers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 1000,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1200,
+      "info": "Match this to your theme's page width setting"
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding",
+      "label": "Mobile padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "z_index",
+      "label": "Layer position",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "default": 10,
+      "info": "Higher values appear above other content"
+    },
+    {
+      "type": "header",
+      "content": "Line style"
+    },
+    {
+      "type": "range",
+      "id": "line_thickness",
+      "label": "Line thickness",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "Line color",
+      "default": "#3d081b"
+    },
+    {
+      "type": "range",
+      "id": "line_opacity",
+      "label": "Line opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vertical dividers"
+    }
+  ]
+}
+{% endschema %}
